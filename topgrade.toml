@@ -51,8 +51,6 @@ use_sudo = true
 "snap revisions" = "command -v snap >/dev/null || exit 0; sudo snap set system refresh.retain=2"
 # Free disk: pip's download/wheel cache
 "pip cache" = "command -v pip >/dev/null || exit 0; pip cache purge"
-# Refresh the database used by `locate`
-"locate database" = "command -v updatedb >/dev/null || exit 0; sudo updatedb"
 # Delete system journal entries older than 7 days
 "journal logs" = "command -v journalctl >/dev/null || exit 0; sudo journalctl --vacuum-time=7d"
 # Permanently delete items trashed more than 30 days ago

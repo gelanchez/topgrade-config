@@ -6,7 +6,7 @@ machine up to date and clean with one command.
 topgrade detects what is installed and updates it: distro packages, snap,
 flatpak, firmware, rustup and cargo binaries, VS Code extensions, git repos in
 `~/git/PUBLIC`, docker images and more. [`topgrade.toml`](topgrade.toml) adds
-the rest as custom commands: Go toolchain, snap revisions, pip cache, locate database, journal
+the rest as custom commands: Go toolchain, snap revisions, pip cache, journal
 logs, old trash and thumbnails, a reboot check and manual backup reminders.
 
 ## Install on a fresh machine

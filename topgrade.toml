@@ -1,0 +1,68 @@
+# topgrade configuration: keep this machine up to date and clean.
+#
+# topgrade runs every step whose tool it finds installed (apt, snap, flatpak,
+# fwupd, rustup, cargo, VS Code extensions, docker, git repos, ...). This file
+# only tunes those built-in steps and adds custom commands for what topgrade
+# does not cover. `topgrade --dry-run` shows the full list for this machine.
+#
+# Run: topgrade (with ~/.config/topgrade.toml symlinked here, see README.md)
+# Reference: https://github.com/topgrade-rs/topgrade/blob/main/config.example.toml
+
+[misc]
+# Ask for the sudo password once at the start instead of mid-run
+pre_sudo = true
+# Let steps clean up after updating: apt clean + autoremove, flatpak unused
+# runtimes, cargo cache (needs cargo-cache)...
+cleanup = true
+# Don't ask for confirmation on each package manager step
+assume_yes = true
+# Desktop notification only when something fails
+notify_end = "on_failure"
+
+[git]
+# Pull every repo directly under ~/git/PUBLIC (rebase, keep local changes
+# stashed across the pull, update submodules)
+repos = ["~/git/PUBLIC/*/"]
+arguments = "--rebase --autostash --recurse-submodules"
+max_concurrency = 4
+
+[firmware]
+# Apply fwupd firmware updates instead of only listing them
+upgrade = true
+
+[containers]
+# After pulling newer versions of local images, remove stopped containers,
+# unused networks, dangling images and build cache (`docker system prune`)
+system_prune = true
+
+[npm]
+# Use sudo only if the global npm directory is not owned by the user
+use_sudo = true
+
+# Custom steps, for things topgrade has no built-in step for.
+# Run after the built-in steps, in this order. Unlike built-in steps, topgrade
+# runs these even when the tool is missing, so each one skips itself if its
+# tool is not installed (keeps the config usable on any distro).
+[commands]
+# Replace /usr/local/go with the latest Go release (topgrade's `go` step
+# only updates binaries installed with `go install`, through gup)
+"Go toolchain" = "~/git/PROJECTS/topgrade-config/scripts/go-update.sh"
+# Free disk: keep only 2 old revisions of each snap (idempotent setting)
+"snap revisions" = "command -v snap >/dev/null || exit 0; sudo snap set system refresh.retain=2"
+# Free disk: pip's download/wheel cache
+"pip cache" = "command -v pip >/dev/null || exit 0; pip cache purge"
+# Refresh the database used by `locate`
+"locate database" = "command -v updatedb >/dev/null || exit 0; sudo updatedb"
+# Delete system journal entries older than 7 days
+"journal logs" = "command -v journalctl >/dev/null || exit 0; sudo journalctl --vacuum-time=7d"
+# Permanently delete items trashed more than 30 days ago
+"trash older than 30 days" = "~/git/PROJECTS/topgrade-config/scripts/trash-purge.sh 30"
+# Delete cached thumbnails not touched for a year
+"thumbnails older than 1 year" = "[ -d ~/.cache/thumbnails ] || exit 0; find ~/.cache/thumbnails -type f -mtime +365 -delete"
+
+# Run once everything else has finished
+[post_commands]
+# Whether kernel/library updates need a reboot (Debian/Ubuntu, Fedora, Arch family)
+"Reboot check" = "~/git/PROJECTS/topgrade-config/scripts/reboot-check.sh"
+# Backups topgrade can't automate
+"Manual reminders" = "printf '%s\\n' 'Firefox: export bookmarks (JSON) to ~/backup/firefox' 'Joplin: run manual backup/export' 'Google Docs: download from Google Drive to ~/backup/gdrive'"

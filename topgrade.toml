@@ -39,6 +39,11 @@ system_prune = true
 # Use sudo only if the global npm directory is not owned by the user
 use_sudo = true
 
+[vscode]
+# After updating extensions, delete the old versions VS Code leaves on disk
+# (applies to every VS Code-compatible editor: VS Code, Antigravity, ...)
+cleanup_obsolete_extensions = true
+
 # Custom steps, for things topgrade has no built-in step for.
 # Run after the built-in steps, in this order. Unlike built-in steps, topgrade
 # runs these even when the tool is missing, so each one skips itself if its
@@ -52,15 +57,15 @@ use_sudo = true
 # Free disk: pip's download/wheel cache
 "pip cache" = "command -v pip >/dev/null || exit 0; pip cache purge"
 # Delete system journal entries older than 7 days
-"journal logs" = "command -v journalctl >/dev/null || exit 0; sudo journalctl --vacuum-time=7d"
+"Journal logs" = "command -v journalctl >/dev/null || exit 0; sudo journalctl --vacuum-time=7d"
 # Permanently delete items trashed more than 30 days ago
-"trash older than 30 days" = "~/git/PROJECTS/topgrade-config/scripts/trash-purge.sh 30"
+"Trash older than 30 days" = "~/git/PROJECTS/topgrade-config/scripts/trash-purge.sh 30"
 # Delete cached thumbnails not touched for a year
-"thumbnails older than 1 year" = "[ -d ~/.cache/thumbnails ] || exit 0; find ~/.cache/thumbnails -type f -mtime +365 -delete"
+"Thumbnails older than 1 year" = "[ -d ~/.cache/thumbnails ] || exit 0; find ~/.cache/thumbnails -type f -mtime +365 -delete"
 
 # Run once everything else has finished
 [post_commands]
 # Whether kernel/library updates need a reboot (Debian/Ubuntu, Fedora, Arch family)
 "Reboot check" = "~/git/PROJECTS/topgrade-config/scripts/reboot-check.sh"
 # Backups topgrade can't automate
-"Manual reminders" = "printf '%s\\n' 'Firefox: export bookmarks (JSON) to ~/backup/firefox' 'Joplin: run manual backup/export' 'Google Docs: download from Google Drive to ~/backup/gdrive'"
+"Manual reminders" = "printf '%s\\n' '- Firefox: export bookmarks (JSON) to ~/backup/firefox' '- Joplin: run manual backup (Tools -> Create backup)' '- Google Docs: download from Google Drive to ~/backup/gdrive'"
